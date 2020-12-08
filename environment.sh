@@ -1,0 +1,13 @@
+#!/bin/bash
+primary_name=cujuft
+backup_name=cujuft
+primary_host=cujuft-machine1
+backup_host=cujuft-machine2
+primary_home="/home/$primary_name"
+backup_home="/home/$backup_name"
+vmp_monitor="$primary_home/vm1.monitor"
+vmb_monitor="$backup_home/vm1r.monitor"
+external_ip=192.168.125.237
+boot_time=15
+reboot_time=30
+reconnect_time=15

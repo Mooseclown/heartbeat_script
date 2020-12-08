@@ -1,0 +1,25 @@
+require 'json'
+require 'net/ftp'
+
+ftp_config = {
+  "ip" => "192.168.110.183",
+  "username" => "owbclient",
+  "password" => "tpc123owb"
+} 
+
+
+save_file_location = File.expand_path './ft_notify.json'
+
+File.open(save_file_location, "w") do |f|
+  f.write ({ :time => Time.now, :msg => "ft machine 2 down" }).to_json
+end
+
+Net::FTP.open(ftp_config["ip"]) do |ftp|
+  ftp.login(user = ftp_config["username"], passwd = ftp_config["password"])
+  # transform file to remote ftp server
+  ftp.puttextfile(save_file_location)
+  # remove local file
+  system("rm #{save_file_location}")
+end
+
+STDOUT.puts "[FTP] #{save_file_location} sent to FTP server"
