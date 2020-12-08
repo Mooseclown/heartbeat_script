@@ -133,54 +133,14 @@ whichmonitor
 local_random=$(cat /tmp/local_random | grep "RANDOM:" | awk '{print $2}'|grep -o '^[0-9]\+')
 echo "local: $local_random"
 
-##echo $local_random
-echo "===== Get Remote Varible ====="
-re='^[0-9]+$'
-get_value=1 
-while [ $get_value != 0 ];
-do
-    ##remote_random=$(./check_remote_random.sh $remote_name@$remote_host | grep "RANDOM:" | awk '{print $2}'|grep -o '^[0-9]\+')
-    remote_random=$(./check_remote_random.sh $remote_name@$remote_host)
 
-    echo "remote: $remote_random"
-    if [ -n $remote_random ]; then
-	echo "TRUE: $remote_random"
-	
-	if ! [[ $remote_random =~ $re ]]
-        then
-	    echo "Not a number"
-	    continue
-	fi
-        
-	if [ $remote_random -gt 0 ]; then
-            echo "remote: $remote_random"
-	    echo "TRUE: $remote_random"
-	    get_value=0
-        fi
-    else 
-	echo "FALSE: $remote_random"
-    fi
-done
-
-if [ $local_random -eq $remote_random ]; then
-    echo "$primary_host run as primaty"
-    if [ $local_machine == $primary_host ]; then
-        disk_recovery
-        run_primary_vm
-        run_backup_vm
-	wait_vm_ready
-        run_ftmode
-    fi
-fi
-
-if [ $local_random -gt $remote_random ]; then
-    echo "local > remote run as primaty"
+echo "$primary_host run as primaty"
+if [ $local_machine == $primary_host ]; then
     disk_recovery
     run_primary_vm
     run_backup_vm
     wait_vm_ready
     run_ftmode
-else
-    echo "local < remote"
 fi
+
 

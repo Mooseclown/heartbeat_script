@@ -25,6 +25,8 @@ remote_monitor=
 monitor=
 remote_host=
 cuju_backup_status_result=0
+
+nc_cmd=
 #################### Function Entry ####################
 run_ruby () {
 	if [ $local_machine == $primary_host ]; then 
@@ -52,24 +54,24 @@ close_run_ruby () {
 }
 
 whichmonitor () {
-	if [ $local_machine == $primary_host ]; then
-		remote_host=$backup_host
-		local_user=$primary_name
-	else
-		remote_host=$primary_host
-		local_user=$backup_name
-	fi
 
-	if [ -e $vmp_monitor ]; then
-		monitor=$vmp_monitor
-		remote_monitor=$vmb_monitor
-	fi
-	
-	if [ -e $vmb_monitor ]; then
-		monitor=$vmb_monitor
-		remote_monitor=$vmp_monitor
-	fi
+        if [ $local_machine == $primary_host ]; then
+                remote_host=$backup_host
+                local_user=$primary_name
+        else
+                remote_host=$primary_host
+                local_user=$backup_name
+        fi
 
+        if [ -e $vmp_monitor ]; then
+                monitor=$vmp_monitor
+                remote_monitor=$vmb_monitor
+        fi
+
+        if [ -e $vmb_monitor ]; then
+                monitor=$vmb_monitor
+                remote_monitor=$vmp_monitor
+        fi
 	echo "Monitor is $monitor"|tee -a  /var/log/failover/script
 }
 
@@ -90,19 +92,19 @@ backup_nop () {
 
 primary_close () {
 	echo "Primary Close"|tee -a  /var/log/failover/script
-	sudo echo "quit" | sudo nc -U $monitor
+	sudo echo "quit" | sudo $nc_cmd $monitor
 	close_run_ruby
 }
 
 backup_close () {
 	echo "Backup Close"|tee -a  /var/log/failover/script
-	sudo echo "quit" | sudo nc -U $monitor
+	sudo echo "quit" | sudo $nc_cmd $monitor
 	close_run_ruby
 }
 
 primary_back_noft () {
 	echo "Primary Go to NOFT"|tee -a  /var/log/failover/script
-	sudo echo "cuju-migrate-cancel" | sudo nc -U $monitor
+	sudo echo "cuju-migrate-cancel" | sudo $nc_cmd $monitor
 	run_ruby
         cd /mnt/nfs/pacescript/ssh_check
         sudo su $local_user tmux_remote_node.sh
@@ -110,7 +112,7 @@ primary_back_noft () {
 
 backup_failover () {
 	echo "Backup Failover"|tee -a  /var/log/failover/script
-	sudo echo "cuju-failover" | sudo nc -U $monitor
+	sudo echo "cuju-failover" | sudo $nc_cmd $monitor
 	run_ruby
         cd /mnt/nfs/pacescript/ssh_check
         sudo su $local_user tmux_remote_node.sh
@@ -119,9 +121,9 @@ backup_failover () {
 backup_have_failovered () {
 	cuju_backup_status_result=0
 	
-	cuju_backup_status=$(sudo echo "cuju-get-ft-mode" | sudo nc -U $monitor | grep "cuju_ft_mode:" | awk '{print $2}'|grep -o '^[0-9]\+')
+	cuju_backup_status=$(sudo echo "cuju-get-ft-mode" | sudo $nc_cmd $monitor | grep "cuju_ft_mode:" | awk '{print $2}'|grep -o '^[0-9]\+')
 	
-	if [ $cuju_backup_status == "5" ]; then 
+	if [ "$cuju_backup_status" == "5" ]; then 
 		cuju_backup_status_result=1
 		echo "RESULT: $cuju_backup_status_result in ft recv mode" |tee -a  /var/log/failover/script
 	else
@@ -142,11 +144,11 @@ check_cuju_exist () {
 	cuju_backup_exist=0
 	local_ft_started=0
 	
-	cuju_primary_exist=$(sudo echo "cuju-get-ft-started" | sudo nc -U $monitor)
+	cuju_primary_exist=$(sudo echo "cuju-get-ft-started" | sudo $nc_cmd $monitor)
 	
-	local_ft_started=$(echo "cuju-get-ft-started" | sudo nc -U $monitor |grep "ft_started:" | awk '{print $2}'|grep -o '^[0-9]\+')
+	local_ft_started=$(echo "cuju-get-ft-started" | sudo $nc_cmd $monitor |grep "ft_started:" | awk '{print $2}'|grep -o '^[0-9]\+')
 
-	if [ $local_ft_started == "1" ]; then 
+	if [ "$local_ft_started" == "1" ]; then 
 		echo "Cuju Primary in FT mode"|tee -a  /var/log/failover/script
 		cuju_exist_primary_result=1
 		return 0
@@ -163,6 +165,15 @@ check_cuju_exist () {
 		echo "Cuju Backup not in FT recv mode"|tee -a  /var/log/failover/script
 		cuju_exist_backup_result=0
 	fi
+}
+check_cuju_exist_variable () {
+	echo "======================================================="
+	echo "cuju_exist_primary_result $cuju_exist_primary_result"
+	echo "cuju_exist_backup_result $cuju_exist_backup_result"
+	echo "cuju_primary_exist $cuju_primary_exist"
+	echo "cuju_backup_exist $cuju_backup_exist"
+	echo "local_ft_started $local_ft_started"
+	echo "======================================================="
 }
 
 failover_start () {
@@ -197,7 +208,10 @@ failover_start () {
 
 failover2_start () {
 	whichmonitor
+	echo "check_cuju_exist"
 	check_cuju_exist
+
+	check_cuju_exist_variable
 
 	if [ $cuju_exist_backup_result == "1" ]; then
 		echo "[Backup]  $local_machine"|tee -a  /var/log/failover/script
@@ -227,6 +241,43 @@ failover2_start () {
 		fi 
 	fi
 }
+
+
+show_environment () {
+echo "==================environment=================="
+echo "primary name $primary_name"
+echo "backup name $backup_name"
+echo "primary host $primary_host"
+echo "backup host $backup_host"
+echo "primary home $primary_home"
+echo "backup home $backup_home"
+echo "vmp_monitor $vmp_monitor"
+echo "vmb_monitor $vmb_monitor"
+echo "external_ip $external_ip"
+echo "boot_time $boot_time"
+echo "reboot_time $reboot_time"
+echo "reconnect_time $reconnect_time"
+echo "==============================================="
+}
+show_environment
+
+get_ubuntu_ver () {
+echo "check ubuntu version"
+ubuntu_version=$(lsb_release -r | awk '{print $2}')
+
+if [ "$ubuntu_version" == "18.04" ]; then
+    echo "18.04 version"
+    nc_cmd="nc -w 1 -U"
+fi  
+
+if [ "$ubuntu_version" == "16.04" ]; then
+    echo "16.04 version"
+    nc_cmd="nc -U"
+fi  
+
+}
+
+get_ubuntu_ver
 
 upSeconds="$(cat /proc/uptime | grep -o '^[0-9]\+')"
 echo $upSeconds

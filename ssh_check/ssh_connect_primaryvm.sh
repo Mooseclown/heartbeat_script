@@ -9,7 +9,7 @@ set command [lindex $argv 2]
 spawn ssh $host -p 22
 
 expect {
-    "nc: unix connect failed: Connection refused" {send "echo $command |sudo nc -U $monitor\r\r"; sleep 1;exp_continue}
+    "nc: unix connect failed: Connection refused" {send "echo $command |sudo nc -w 1 -U $monitor\r\r"; sleep 1;exp_continue}
     "Connection refused" {exit 1}
     "Name or service not known" {exit 2}
     "Connection timed out" {exit 3}    

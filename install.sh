@@ -48,7 +48,7 @@ if [ -f "usr/sbin/corosync" ];then
     echo "find pacemaker/corosync exist"
 else
     echo "No pacemaker/corosync application, install it"
-    sudo apt install -y pacemaker libxml2-utils
+    sudo apt install -y pacemaker libxml2-utils crmsh
 fi
 
 if [ -f "/usr/bin/fping" ];then
