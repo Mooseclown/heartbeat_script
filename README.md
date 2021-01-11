@@ -28,7 +28,14 @@ $sudo vim /etc/hosts
 10.0.2.4 cujuft-machine1
 10.0.2.5 cujuft-machine2
 ```
-## 3. 設定environment.sh [P/B]
+
+## 3. 下載 auto script [P/B]
+```shell
+git clone https://github.com/kester-lin/heartbeat_script.git
+cd heartbeat_script
+```
+
+## 4. 設定environment.sh [P/B]
 ```shell
 primary_name=cujuft
 backup_name=cujuft
@@ -38,11 +45,15 @@ vmp_monitor=/home/cujuft/vm1.monitor
 vmb_monitor=/home/cujuft/vm1r.monitor
 external_ip=192.168.110.183
 ```
-## 4. 新增設定檔 [P/B]
-sudo vi /etc/corosync/corosync.conf
+
+
+## 5. 新增設定檔 [P/B]
+sudo vi corosync.conf
+
 bindnetaddr: 為網域
 ring0_addr:node 各自的address
 name: node 各自的hostname
+
 ```shell
 totem {
   version: 2
@@ -78,13 +89,12 @@ quorum {
   auto_tie_breaker: 0
 }
 ```
-## 5. 安裝 auto script [P/B]
+## 6. 安裝 auto script [P/B]
 ```shell
-git clone https://github.com/kester-lin/pacescript.git
-cd pacescript
+cd heartbeat_script
 sudo ./install.sh
 ```
-## 6. ssh-keygen [P/B]
+## 7. ssh-keygen [P/B]
 ```shell
 ssh-keygen
 ssh-copy-id [cujuft-machine1/cujuft-machine2]
@@ -131,7 +141,7 @@ Full list of resources:
 
 ### 發生Failover後 
 ```shell
-$cd pacescript
+$cd heartbeat_script
 $sudo ./show.sh
 
 start
