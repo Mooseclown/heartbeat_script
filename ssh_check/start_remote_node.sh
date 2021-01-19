@@ -1,6 +1,6 @@
 #/bin/bash
 LOCAL_PWD=`pwd`
-cd /mnt/nfs/pacescript
+cd /mnt/nfs/heartbeat_script
 . ./environment.sh
 
 echo "$LOCAL_PWD"
@@ -128,7 +128,7 @@ whichmonitor () {
 }
 
 whichmonitor 
-cd /mnt/nfs/pacescript/ssh_check/
+cd $prefix_folder/ssh_check/
 echo "==================== wait_remote_host ====================" | sudo tee -a /var/log/failover/ft
 wait_remote_host
 echo "==================== run_backup_vm ====================" | sudo tee -a /var/log/failover/ft

@@ -1,6 +1,6 @@
 #!/bin/bash
 LOCAL_PWD=`pwd`
-cd /mnt/nfs/pacescript
+cd /mnt/nfs/heartbeat_script
 . ./environment.sh
 
 if [ -e $vmp_monitor ]; then
@@ -31,7 +31,7 @@ local_random=1
 echo "RANDOM: $local_random" | sudo tee /tmp/local_random
 
 tmux new-session -d -s ftmain -n myWindow
-tmux send-keys -t ftmain:myWindow "cd /mnt/nfs/pacescript/ssh_check" Enter
+tmux send-keys -t ftmain:myWindow "cd $prefix_folder/ssh_check" Enter
 tmux send-keys -t ftmain:myWindow "./start_select_node.sh" Enter
 tmux send-keys -t ftmain:myWindow "exit" Enter
 

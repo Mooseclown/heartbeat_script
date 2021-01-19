@@ -149,7 +149,7 @@ failoverscript_monitor() {
 			if [ -f $state_dir/monitor ]; then
 				####echo "monitor exist call fail script" |tee -a  /var/log/failover/script
 				####/usr/local/bin/failover.sh
-				/mnt/nfs/pacescript/failover.sh
+				/mnt/nfs/heartbeat_script/failover.sh
 				rm $state_dir/monitor
 				touch $state_dir/monitor_stop
 			fi

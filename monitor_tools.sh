@@ -4,7 +4,7 @@ echo "cuju-get-ft-mode" | sudo nc -U /home/cujuft/vm1.monitor
 
 
 LOCAL_PWD=`pwd`
-cd /mnt/nfs/pacescript
+cd /mnt/nfs/heartbeat_script
 . ./environment.sh
 
 

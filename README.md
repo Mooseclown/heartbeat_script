@@ -112,7 +112,7 @@ ssh-copy-id [cujuft-machine1/cujuft-machine2]
 `reservice.sh`:重新啟動pacemaker/corosync service
 
 ```shell
-$cd pacescript 
+$cd heartbeat_script 
 $ls -al
 -rwxr-xr-x 1 ft ft   94 Sep  6 11:05 clearlog.sh
 -rwxr-xr-x 1 ft ft 5340 Sep  6 13:42 FailOverScript

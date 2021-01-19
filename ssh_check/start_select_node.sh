@@ -1,6 +1,6 @@
 #/bin/bash
 LOCAL_PWD=`pwd`
-cd /mnt/nfs/pacescript
+cd /mnt/nfs/heartbeat_script
 . ./environment.sh
 
 echo "$LOCAL_PWD"

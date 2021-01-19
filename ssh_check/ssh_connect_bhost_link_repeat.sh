@@ -8,8 +8,8 @@ set host [lindex $argv 0]
 spawn ssh $host -p 22
 
 expect {
-    "nc: unix connect failed: Connection refused" {send "bash /mnt/nfs/pacescript/ssh_check/tmux_backvm_start.sh\r"; sleep 1; exit 0}
-    "nc: unix connect failed: No such file or directory" {send "bash /mnt/nfs/pacescript/ssh_check/tmux_backvm_start.sh\r"; sleep 1; exit 0}
+    "nc: unix connect failed: Connection refused" {send "bash /mnt/nfs/heartbeat_script/ssh_check/tmux_backvm_start.sh\r"; sleep 1; exit 0}
+    "nc: unix connect failed: No such file or directory" {send "bash /mnt/nfs/heartbeat_script/ssh_check/tmux_backvm_start.sh\r"; sleep 1; exit 0}
     "Connection refused" {exit 1}
     "Name or service not known" {exit 2}
     "Connection timed out" {exit 3}    

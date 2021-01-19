@@ -1,7 +1,7 @@
 #!/bin/bash
 #################### Control Variable ####################
 LOCAL_PWD=`pwd`
-cd /mnt/nfs/pacescript
+cd /mnt/nfs/heartbeat_script
 . ./environment.sh
 
 echo "$LOCAL_PWD"
@@ -30,11 +30,11 @@ run_ruby () {
 	if [ $local_machine == $primary_host ]; then 
 		echo "[Run Ruby] ftp_machine1"|tee -a  /var/log/failover/script
 		####ruby /usr/local/bin/ftp_machine1.rb
-		ruby /mnt/nfs/pacescript/ftp_machine1.rb
+		ruby $prefix_folder/ftp_machine1.rb
 	else
 		echo "[Run Ruby] ftp_machine2"|tee -a  /var/log/failover/script
 		####ruby /usr/local/bin/ftp_machine2.rb
-		ruby /mnt/nfs/pacescript/ftp_machine2.rb
+		ruby $prefix_folder/ftp_machine2.rb
 	fi
 		echo "=============================="|tee -a  /var/log/failover/script
 }
@@ -42,11 +42,11 @@ close_run_ruby () {
 	if [ $local_machine == $primary_host ]; then 
 		echo "[Run Close Ruby] ftp_machine2"|tee -a  /var/log/failover/script
 		####ruby /usr/local/bin/ftp_machine2.rb
-		ruby /mnt/nfs/pacescript/ftp_machine2.rb
+		ruby $prefix_foldedr/ftp_machine2.rb
 	else
 		echo "[Run Close Ruby] ftp_machine1"|tee -a  /var/log/failover/script
 		####ruby /usr/local/bin/ftp_machine1.rb
-		ruby /mnt/nfs/pacescript/ftp_machine1.rb
+		ruby $prefix_folder/ftp_machine1.rb
 	fi
 		echo "=============================="|tee -a  /var/log/failover/script
 }
@@ -75,7 +75,7 @@ whichmonitor () {
 
 wait_remote (){
 	ssh_host=$($local_user@)
-	bash /mnt/nfs/pacescript/ssh_check/check_bhost_start_bvm.sh $remote_host $remote_monitor
+	bash $prefix_folder/ssh_check/check_bhost_start_bvm.sh $remote_host $remote_monitor
 }
 
 primary_nop () {
@@ -104,7 +104,7 @@ primary_back_noft () {
 	echo "Primary Go to NOFT"|tee -a  /var/log/failover/script
 	sudo echo "cuju-migrate-cancel" | sudo nc -U $monitor
 	run_ruby
-        cd /mnt/nfs/pacescript/ssh_check
+        cd $prefix_folder/ssh_check
         sudo su $local_user tmux_remote_node.sh
 }
 
@@ -112,7 +112,7 @@ backup_failover () {
 	echo "Backup Failover"|tee -a  /var/log/failover/script
 	sudo echo "cuju-failover" | sudo nc -U $monitor
 	run_ruby
-        cd /mnt/nfs/pacescript/ssh_check
+        cd $prefix_folder/ssh_check
         sudo su $local_user tmux_remote_node.sh
 }
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+prefix_folder=/mnt/nfs/heartbeat_script
 primary_name=cujuft
 backup_name=cujuft
 primary_host=cujuft-machine1
