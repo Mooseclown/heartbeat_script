@@ -10,5 +10,5 @@ vmp_monitor="$primary_home/vm1.monitor"
 vmb_monitor="$backup_home/vm1r.monitor"
 external_ip=192.168.125.237
 boot_time=15
-reboot_time=30
+reboot_time=90
 reconnect_time=15

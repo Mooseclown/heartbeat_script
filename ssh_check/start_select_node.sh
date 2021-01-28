@@ -86,6 +86,7 @@ run_primary_vm () {
 }
 
 run_backup_vm () {
+    sleep $boot_time
     echo "Start Backup VM at $remote_host"
     ./check_bhost_start_bvm.sh $remote_host $remote_monitor
 }
@@ -162,25 +163,28 @@ do
     fi
 done
 
-if [ $local_random -eq $remote_random ]; then
-    echo "$primary_host run as primaty"
-    if [ $local_machine == $primary_host ]; then
+$vm_state=$(./check_vm_run.sh $remote_host $remote_monitor| grep "result:"| awk '{print $5}')
+echo "vm_state: $vm_state"
+if [ $vm_state != 0 ]; then
+    if [ $local_random -eq $remote_random ]; then
+        echo "$primary_host run as primaty"
+        if [ $local_machine == $primary_host ]; then
+            disk_recovery
+            run_primary_vm
+            run_backup_vm
+        wait_vm_ready
+            run_ftmode
+        fi
+    fi
+
+    if [ $local_random -gt $remote_random ]; then
+        echo "local > remote run as primaty"
         disk_recovery
         run_primary_vm
         run_backup_vm
-	wait_vm_ready
+        wait_vm_ready
         run_ftmode
+    else
+        echo "local < remote"
     fi
 fi
-
-if [ $local_random -gt $remote_random ]; then
-    echo "local > remote run as primaty"
-    disk_recovery
-    run_primary_vm
-    run_backup_vm
-    wait_vm_ready
-    run_ftmode
-else
-    echo "local < remote"
-fi
-
