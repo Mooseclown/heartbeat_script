@@ -102,6 +102,7 @@ run_primary_vm () {
 }
 
 run_backup_vm () {
+    sleep $reboot_time
     echo "Start Backup VM at $remote_host $remote_monitor" | sudo tee -a /var/log/failover/ft
     ./check_bhost_start_bvm.sh $remote_host $remote_monitor
 }

@@ -163,13 +163,13 @@ do
     fi
 done
 
-$vm_state=$(./check_vm_run.sh $remote_host $remote_monitor| grep "result:"| awk '{print $5}')
+vm_state=$(./check_vm_run.sh $remote_host $remote_monitor| grep "result:"| awk '{print $5}')
 echo "vm_state: $vm_state"
 if [ $vm_state != 0 ]; then
     if [ $local_random -eq $remote_random ]; then
         echo "$primary_host run as primaty"
         if [ $local_machine == $primary_host ]; then
-            disk_recovery
+            #disk_recovery
             run_primary_vm
             run_backup_vm
         wait_vm_ready
@@ -179,7 +179,7 @@ if [ $vm_state != 0 ]; then
 
     if [ $local_random -gt $remote_random ]; then
         echo "local > remote run as primaty"
-        disk_recovery
+        #disk_recovery
         run_primary_vm
         run_backup_vm
         wait_vm_ready

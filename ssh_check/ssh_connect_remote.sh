@@ -19,9 +19,7 @@ expect {
     "continue connecting" {send "yes\r";exp_continue}
     "password:" {send "$pw\r";exp_continue}
     "Last login" {send "echo $command | sudo nc -U $monitor\r"; exp_continue}
-    "cuju_ft_mode: 1" {exit 0}
-    "cuju_ft_mode: 0" {exit 0}
-
+    "cuju_ft_mode: 6" {exit 0}
 } 
 
 expect eof
